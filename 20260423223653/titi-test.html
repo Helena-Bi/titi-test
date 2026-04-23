@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>TITI 人格测试</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-card: #16213e;
+      --accent: #e94560;
+      --secondary: #0f3460;
+      --text: #eaeaea;
+      --text-muted: #a0a0a0;
+      --highlight: #533483;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container { width: 100%; max-width: 480px; }
+    .page { display: none; animation: fadeIn 0.3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .start-page { text-align: center; }
+    .logo { font-size: 3rem; margin-bottom: 10px; animation: bounce 2s infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent), #ff6b9d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 40px; }
+    .quote { font-style: italic; color: var(--text-muted); margin-bottom: 50px; font-size: 1.1rem; line-height: 1.6; }
+    .btn {
+      background: linear-gradient(135deg, var(--accent), #ff6b9d);
+      color: white;
+      border: none;
+      padding: 16px 48px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:hover { box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4); }
+    .quiz-page {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    .progress { text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
+    .progress span { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+    .question { font-size: 1.15rem; line-height: 1.6; margin-bottom: 28px; font-weight: 500; }
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .option {
+      background: var(--secondary);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .option:active { transform: scale(0.98); }
+    .option.selected { border-color: var(--accent); background: var(--highlight); }
+    .option-letter {
+      background: var(--accent);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .option-text { line-height: 1.5; padding-top: 3px; }
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 24px; }
+    .nav-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.95rem; padding: 8px 0; }
+    .nav-btn:active { color: var(--text); }
+    .hidden { visibility: hidden; }
+    .result-page { text-align: center; }
+    .result-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    .result-emoji { font-size: 5rem; margin-bottom: 16px; }
+    .result-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 12px; color: var(--accent); }
+    .result-quote { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 24px; font-style: italic; }
+    .result-desc { font-size: 1rem; line-height: 1.8; color: var(--text); text-align: left; margin-bottom: 24px; }
+    .egg { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 32px; padding: 12px; background: rgba(233, 69, 96, 0.1); border-radius: 8px; }
+    .restart-btn {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 14px 36px;
+      font-size: 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+    }
+    .restart-btn:active { transform: scale(0.98); background: var(--accent); color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="startPage" class="page start-page active">
+      <div class="logo">🎭</div>
+      <h1 class="title">TITI 人格测试</h1>
+      <p class="subtitle">Totally Inaccurate Test Indicator</p>
+      <p class="quote">"一万种结局都无法写尽冒险者那一瞬间的故事"</p>
+      <button class="btn" id="startBtn">开始测试</button>
+    </div>
+
+    <div id="quizPage" class="page quiz-page">
+      <div class="progress">第 <span id="currentNum">1</span> / 12 题</div>
+      <p class="question" id="questionText"></p>
+      <div class="options" id="optionsContainer"></div>
+      <div class="nav-buttons">
+        <button class="nav-btn hidden" id="prevBtn">← 上一题</button>
+        <span></span>
+      </div>
+    </div>
+
+    <div id="resultPage" class="page result-page">
+      <div class="result-card">
+        <div class="result-emoji" id="resultEmoji"></div>
+        <h2 class="result-name" id="resultName"></h2>
+        <p class="result-quote" id="resultQuote"></p>
+        <p class="result-desc" id="resultDesc"></p>
+        <div class="egg">本测试准确度：0%，你信了吗？</div>
+        <button class="restart-btn" id="restartBtn">再测一次</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var questions = [
+      {text:'你第一次在朋友圈看到"测测你是哪种人格"的链接时，你的反应是？',options:['秒点开。手指比大脑快，先做再说。','先看看是谁发的。如果是某个测啥都信的朋友，无视；如果是靠谱的人发，考虑点。','截图发群里，配文：新型网络诈骗，大家别点。']},
+      {text:'你刚做完一份测试，结果显示你是"内向社恐型"，你心里想的是？',options:['它说的好像有点道理……我是不是真的太内向了？然后默默接受了这个人设。','这题不科学。选项引导太明显了，重测一次换个答案应该能翻盘。','不管测出啥，截图先发朋友圈，配一个捂脸笑哭的表情。']},
+      {text:'你做完测试后，通常怎么处理结果？',options:['截图保存到手机相册，然后就没有然后了。这份报告从此进入数字冷宫。','立刻分享到所有社交平台，并配一句"是我本人"。','不截图不分享，但我会在脑子里默默归档，并且下次跟人聊天时突然引用。']},
+      {text:'朋友给你发来一份测试结果，说"你快测测，超准"，你通常怎么做？',options:['点开测了。来都来了。','先花十分钟给朋友分析他的测试结果哪里合理哪里扯淡。','回他一个链接，标题是《心理测试的十二个常见骗局》。']},
+      {text:'你发现自己前后两次测同一套题，结果完全不一样，你的第一反应是？',options:['完了，我是谁？我在哪？我到底是个什么东西？','肯定是这次答题状态不对，再来第三遍，取个中位数。','意料之中。这题本来就没信效度，两次一样才奇怪。']},
+      {text:'你在交友软件上看到一个人简介写着"INTJ，所以请直奔主题"，你心里想？',options:['挺好的，高效筛选，省时间。我自己也写。','默默在脑内给TA做了一个完整的类型评估，并怀疑TA其实是ISTJ。','这人可能被测试洗脑了，但跟我没关系，划走。']},
+      {text:'深夜十二点，你刷到一个标题为《99%的人做完都哭了的人格测试》的链接，你？',options:['当然测。不仅测，还开小号再测一遍，确认结果稳定性。','测完，得到一个离谱结果，截屏，准备明天当群聊素材。','不测。但我在评论区逐条分析这个测试引用了哪些伪心理学话术。']},
+      {text:'如果有人在你面前说你最信任的那套测试"跟星座差不多"，你会？',options:['忍着。但内心已经开始组织反驳论据，并后悔没带自己整理的学术笔记。','当场打开话匣子，从荣格讲到信效度，从量表设计讲到统计学——你不能忍受它被侮辱。','无所谓。你说得对，它就是个玩具，但我就爱玩。']},
+      {text:'你做测试时，遇到一道完全看不懂的题目，你的做法是？',options:['盲选。缘分到了，结果自然有它的道理。','认真揣摩出题人意图，并试图在脑内用心理测量学修补这道题的缺陷。','直接跳过。但这道题会成为我稍后吐槽长文里的重点素材。']},
+      {text:'你测出了一个自己不太喜欢的类型，接下来你会？',options:['嘴上说"不准"，手里已经重新打开测试，调整了几个不确定的选项。','难过十分钟，然后开始检索"XX型如何转变成XX型"。','无所谓。反正我明天再测，结果又不一样了。']},
+      {text:'你身边所有朋友都在疯狂转发一个测试，只有你没测，原因是？',options:['我在等热度过去。现在测等于从众，深夜独自测才是我的人格探索仪式。','我对测试没意见，但我对"所有人都在测的东西"有天然免疫。','什么测试？哪个群？我没看到啊。']},
+      {text:'这份"TITI人格测试"你做到现在，心里在想什么？',options:['"赶紧出结果，我倒要看看它怎么定义我。"','第3题和第7题测的是同一个维度吧，题目设计者是不是没做因素分析？','"我不在乎我的结果。我只想做完了发给朋友，然后看他们做。"']}
+    ];
+
+    var results = {
+      'ti做题家':{emoji:'🐒',name:'ti做题家',quote:'测完即爽，爽完即忘，下次还来。',desc:'你的手机收藏夹里躺着三百多份人格测试报告，但问你是什么类型，你得现场翻。你不是在做测试，你是在用测试进行手指复健。排队时测一个、等外卖时测一个、蹲马桶时再测一个，测完截个图就再也没打开过。你享受的不是"认识自己"，而是选项点击那一刻的清脆手感。你的人生是一场无限刷题游戏，而你是这个游戏里最快乐的NPC。'},
+      '朋友圈测试官':{emoji:'📢',name:'朋友圈测试官',quote:'独测测不如众乐乐。',desc:'你测的不是人格，是朋友圈今日份的社交货币。一份测试结果到你手里，必须经过精心的截图、裁剪、配文三连，最后以一个巧妙的角度发布。结果准不准不重要，重要的是评论区必须有人说"哈哈哈哈是我"。你是测试界的4A创意总监，每一个测评链接都是你的brief，而你交出的永远是一份刷屏级作品。'},
+      '寂寞仓鼠':{emoji:'🐹',name:'寂寞仓鼠',quote:'不分享，不讨论，不承认。',desc:'你囤积全网所有测试结果的方式，和仓鼠囤瓜子的逻辑完全一致——没有任何目的，纯粹是囤着爽。你的相册里安静地躺着上百份人格报告，它们从未见过阳光，未来也不会。你做测试的快乐来自那个"完成"的瞬间，之后这些结果就像被你塞进颊囊的瓜子，存在就行，不需要意义。'},
+      '赛博信众':{emoji:'🙏',name:'赛博信众',quote:'它比我妈还了解我。',desc:'你和测试之间是一场双向奔赴的迷信。早上测出"哲学家型"，你立刻开始用深沉的目光审视通勤地铁；下午测出"社交达人型"，你当场给三个月没联系的朋友发了消息。你把这辈子的信任额度全部充值给了人格测试，而每一次结果都像一封写到你心坎里的信。准不准从来不是问题，问题是你已经离不开它了。'},
+      '原教旨信徒':{emoji:'📜',name:'原教旨信徒',quote:'你可以骂我，但不能质疑这个测试。',desc:'你对某套测试体系的忠诚，比大多数人的婚姻都牢固。如果有人胆敢在你面前说"这个量表信度一般"，你会在三秒内调出参考文献、原著页码和三年积累的学术笔记，给对方上一堂不容置疑的理论课。你守护的从来不是自己的人格分类，而是这套体系本身的尊严。你是它的人间代言人，也是它最忠实的带刀侍卫。'},
+      '行走标签侠':{emoji:'🏷️',name:'行走标签侠',quote:'我是标签，标签是我。',desc:'你的人还没有进入房间，四个字母已经先到了。社交简介、交友软件、工作邮件签名——标签比你本人更早被记住。你默认世界运行的方式是"先看类型再交往"，"我是ENFP，你呢"是你的标准开场白，也是你递出去的第一张隐形名片。你的人格类型不是一份报告，是你穿在身上最合身的那件外套。'},
+      '测试军师':{emoji:'🗣️',name:'测试军师',quote:'自己懒得测，但喜欢拿测试给别人贴标签。',desc:'你对测试本身兴趣有限，但对别人的测试结果有一套完整的分析体系。朋友发来一份报告，你能洋洋洒洒解读三千字，附带人生建议和职业规划。问你自己的类型是什么，你微微一笑，说"这些工具都太粗糙了"。你不是不爱测试，你是觉得亲自下场太掉价——你享受的从来不是照镜子，而是当镜子。'},
+      '结果翻译官':{emoji:'🔍',name:'结果翻译官',quote:'你不是答题人，你是出题人。',desc:'一个只有三行字的人格测试结果，在你手里能变成一本《人间观察指南》。你天然认为所有测试报告都是加密文本，必须由你亲自破译。你给别人翻译结果时的投入程度，比自己做测试高了十倍不止，而你对此的解释是："观棋不语非君子。"你是测试界的同声传译，从不亲自开口，但永远有话要说。'},
+      '结果美容师':{emoji:'🔁',name:'结果美容师',quote:'这不是作弊，是校正误差。',desc:'你是自己人格的精修师。测出内向？重选到外向为止。测出悲观？那一定是哪道题的理解有偏差。你发自拍知道要修图，做测试当然也要。出图之前，一切都不算数；出图之后，一切都是真的。你深信不存在准不准的问题，只存在"系统误差有没有被纠正"的问题。而你的使命，就是纠正它。'},
+      '人格叠加态':{emoji:'🃏',name:'人格叠加态',quote:'我是谁，取决于你什么时候问。',desc:'你的人格是一团未被观测的量子云，每次打开一份新测试，就坍缩出一个新结果。上午你是哲学家，下午你是社恐，晚上你是领袖型，凌晨你拒绝定义。你的自我认知已经放弃了达成共识，转而享受这种开盲盒般的快感。你不再问"我到底是什么样的人"，你只想知道"今天我能开出什么稀有款"。'},
+      '测试隐士':{emoji:'👻',name:'测试隐士',quote:'深夜独自做题，从不分享，像搞情报。',desc:'你在凌晨两点打开第47份人格测试，屏幕的光映在脸上，像在进行一场只有自己知道的秘密任务。你测完之后甚至不会截图——结果直接映入脑海，存档，然后删除访问记录。你相信真正的自我认知是一件高度私密的事，私密到你本人看完了都觉得需要对自己保密。'},
+      '弹幕型选手':{emoji:'🧐',name:'弹幕型选手',quote:'边测边骂，但绝不会半途而废。',desc:'你做人格测试的体验，类似于边看烂片边发弹幕。每一道题都能触发你的吐槽——这选项不互斥、这措辞有诱导、这题明显测的不是人格是星座。但你无论如何都会做完最后一道题，因为你写差评之前需要完整的素材。你做测试的目的从来不是认识自己，而是写一篇《关于本测试的十二个方法论批判》长文。'},
+      '测试宿敌':{emoji:'⚔️',name:'测试宿敌',quote:'恨它，所以做它一百遍。',desc:'你和某一个测试之间，存在着一种旁人难以理解的敌对关系。你不信它，但你做了它几十遍。每一次做完你都冷笑一声："果然还是垃圾。"你的乐趣从来不是探索自我，而是反复验证一个已知结论——"你果然不准。"你不是在测试自己，你是在测试这个测试，而它永远通不过你的考验。'},
+      '反诈先锋':{emoji:'🛡️',name:'反诈先锋',quote:'任何测试都是新型网络陷阱。',desc:'你的大脑是一台行走的国家反诈中心APP。朋友分享一个人格测试链接，你的第一反应不是"有意思"，而是"警惕新型网络钓鱼"。你已经在内心完成了风险等级评估、隐私泄露推演和一份三千字的防骗科普大纲。你可能是全群最清醒的人，但也是全群唯一一个已经被踢出群聊的人。'},
+      '云淡风轻':{emoji:'☁️',name:'云淡风轻',quote:'在这个全员疯魔的测试宇宙里，你是唯一的神。',desc:'你点进这个测试纯属手滑。上面那十四个结局你一个都不认识，因为你对人格测试的理解程度和猫对微积分的理解程度差不多。这个页面之外的世界正在被测试狂潮席卷，而你在风暴眼里安安静静地活着。你此刻正准备关掉页面，去做一些真正重要的事——比如去超市称个体重。'}
+    };
+
+    var scoreMap = [
+      {A:['ti做题家','朋友圈测试官','赛博信众','人格叠加态','寂寞仓鼠'],B:['测试军师','结果翻译官','行走标签侠','测试隐士'],C:['反诈先锋','云淡风轻']},
+      {A:['赛博信众','行走标签侠','原教旨信徒','测试隐士'],B:['结果美容师','弹幕型选手','测试宿敌'],C:['朋友圈测试官','ti做题家']},
+      {A:['ti做题家','寂寞仓鼠','测试隐士'],B:['朋友圈测试官','行走标签侠','赛博信众'],C:['结果翻译官','测试军师','测试隐士']},
+      {A:['ti做题家','寂寞仓鼠','赛博信众'],B:['测试军师','结果翻译官','弹幕型选手'],C:['反诈先锋','弹幕型选手']},
+      {A:['人格叠加态','赛博信众'],B:['结果美容师','ti做题家'],C:['弹幕型选手','测试宿敌']},
+      {A:['行走标签侠','赛博信众'],B:['测试军师','结果翻译官'],C:['云淡风轻']},
+      {A:['ti做题家','人格叠加态','寂寞仓鼠','测试隐士','测试宿敌'],B:['朋友圈测试官','ti做题家'],C:['弹幕型选手','测试宿敌','反诈先锋']},
+      {A:['原教旨信徒','行走标签侠','赛博信众'],B:['原教旨信徒','弹幕型选手'],C:['ti做题家','云淡风轻','朋友圈测试官']},
+      {A:['ti做题家','朋友圈测试官','寂寞仓鼠'],B:['弹幕型选手','测试宿敌'],C:['弹幕型选手','测试宿敌']},
+      {A:['结果美容师','ti做题家'],B:['赛博信众','行走标签侠','结果美容师'],C:['人格叠加态','ti做题家']},
+      {A:['测试隐士','寂寞仓鼠'],B:['反诈先锋','云淡风轻'],C:['云淡风轻']},
+      {A:['赛博信众','ti做题家','人格叠加态','朋友圈测试官'],B:['弹幕型选手','测试宿敌','反诈先锋'],C:['朋友圈测试官','测试军师','结果翻译官']}
+    ];
+
+    var priorityOrder = ['ti做题家','朋友圈测试官','寂寞仓鼠','赛博信众','原教旨信徒','行走标签侠','测试军师','结果翻译官','结果美容师','人格叠加态','测试隐士','弹幕型选手','测试宿敌','反诈先锋','云淡风轻'];
+
+    var currentQuestion = 0;
+    var answers = [null,null,null,null,null,null,null,null,null,null,null,null];
+    var isTransitioning = false;
+
+    document.getElementById('startBtn').onclick = function() {
+      currentQuestion = 0;
+      answers = [null,null,null,null,null,null,null,null,null,null,null,null];
+      var pages = document.getElementsByClassName('page');
+      for (var i = 0; i < pages.length; i++) {
+        pages[i].classList.remove('active');
+      }
+      document.getElementById('quizPage').classList.add('active');
+      renderQuestion();
+    };
+
+    document.getElementById('prevBtn').onclick = function() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    };
+
+    document.getElementById('restartBtn').onclick = function() {
+      document.getElementById('resultPage').classList.remove('active');
+      document.getElementById('startPage').classList.add('active');
+    };
+
+    function renderQuestion() {
+      var q = questions[currentQuestion];
+      document.getElementById('currentNum').textContent = currentQuestion + 1;
+      document.getElementById('questionText').textContent = q.text;
+      var container = document.getElementById('optionsContainer');
+      var html = '';
+      var letters = ['A', 'B', 'C'];
+      for (var i = 0; i < q.options.length; i++) {
+        var selected = answers[currentQuestion] === i ? ' selected' : '';
+        html += '<div class="option' + selected + '" onclick="selectOption(' + i + ')">';
+        html += '<span class="option-letter">' + letters[i] + '</span>';
+        html += '<span class="option-text">' + q.options[i] + '</span>';
+        html += '</div>';
+      }
+      container.innerHTML = html;
+      var prevBtn = document.getElementById('prevBtn');
+      if (currentQuestion === 0) {
+        prevBtn.classList.add('hidden');
+      } else {
+        prevBtn.classList.remove('hidden');
+      }
+    }
+
+    function selectOption(index) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      answers[currentQuestion] = index;
+      var options = document.getElementsByClassName('option');
+      for (var i = 0; i < options.length; i++) {
+        if (i === index) {
+          options[i].classList.add('selected');
+        } else {
+          options[i].classList.remove('selected');
+        }
+      }
+      setTimeout(function() {
+        if (currentQuestion < 11) {
+          currentQuestion++;
+          renderQuestion();
+        } else {
+          showResult();
+        }
+        isTransitioning = false;
+      }, 400);
+    }
+
+    function showResult() {
+      var score = {};
+      for (var key in results) {
+        score[key] = 0;
+      }
+      for (var i = 0; i < 12; i++) {
+        if (answers[i] !== null) {
+          var option = answers[i] === 0 ? 'A' : answers[i] === 1 ? 'B' : 'C';
+          var types = scoreMap[i][option];
+          for (var j = 0; j < types.length; j++) {
+            score[types[j]]++;
+          }
+        }
+      }
+      var maxValue = 0;
+      for (var k in score) {
+        if (score[k] > maxValue) maxValue = score[k];
+      }
+      var tiedTypes = [];
+      for (var m in score) {
+        if (score[m] === maxValue) tiedTypes.push(m);
+      }
+      var finalType = tiedTypes[0];
+      for (var n = 0; n < priorityOrder.length; n++) {
+        if (tiedTypes.indexOf(priorityOrder[n]) !== -1) {
+          finalType = priorityOrder[n];
+          break;
+        }
+      }
+      var r = results[finalType];
+      document.getElementById('resultEmoji').textContent = r.emoji;
+      document.getElementById('resultName').textContent = r.name;
+      document.getElementById('resultQuote').textContent = r.quote;
+      document.getElementById('resultDesc').textContent = r.desc;
+      var pages = document.getElementsByClassName('page');
+      for (var p = 0; p < pages.length; p++) {
+        pages[p].classList.remove('active');
+      }
+      document.getElementById('resultPage').classList.add('active');
+    }
+  </script>
+</body>
+</html>
